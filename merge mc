@@ -1,0 +1,106 @@
+#include <iostream>
+#include<fstream>
+#include <TLorentzVector.h>
+#include <TFile.h>
+#include <TTree.h>
+using namespace std;
+// HLT_tau25_mediumRNN_tracktwoMVA 
+void mc_general()
+{
+    double xbins[] = {25,28,30,32,34,36,39,43,52,64,80,100,150,300};
+    
+    TFile* fin_data = new TFile("data_general.root", "read");
+    TH1D* datass1 = (TH1D*)fin_data->Get("triggeron_ss");
+    TH1D* datass2 = (TH1D*)fin_data->Get("triggeron1p_ss");
+    TH1D* datass3 = (TH1D*)fin_data->Get("triggeron3p_ss");
+    TH1D* datass4 = (TH1D*)fin_data->Get("triggeroff_ss");
+    TH1D* datass5 = (TH1D*)fin_data->Get("triggeroff1p_ss");
+    TH1D* datass6 = (TH1D*)fin_data->Get("triggeroff3p_ss");
+    
+    TFile* fin1 = new TFile("wlv_general.root", "read");
+    TH1D* wlv1 = (TH1D*)fin1->Get("triggeron");
+    TH1D* wlv2 = (TH1D*)fin1->Get("triggeron1p");
+    TH1D* wlv3 = (TH1D*)fin1->Get("triggeron3p");
+    TH1D* wlv4 = (TH1D*)fin1->Get("triggeroff");
+    TH1D* wlv5 = (TH1D*)fin1->Get("triggeroff1p");
+    TH1D* wlv6 = (TH1D*)fin1->Get("triggeroff3p");
+  
+    TFile* fin2 = new TFile("zll_general.root", "read");
+    TH1D* zll1 = (TH1D*)fin2->Get("triggeron");
+    TH1D* zll2 = (TH1D*)fin2->Get("triggeron1p");
+    TH1D* zll3 = (TH1D*)fin2->Get("triggeron3p");
+    TH1D* zll4 = (TH1D*)fin2->Get("triggeroff");
+    TH1D* zll5 = (TH1D*)fin2->Get("triggeroff1p");
+    TH1D* zll6 = (TH1D*)fin2->Get("triggeroff3p");
+  
+    TFile* fin3 = new TFile("tt_general.root", "read");
+    TH1D* tt1 = (TH1D*)fin3->Get("triggeron");
+    TH1D* tt2 = (TH1D*)fin3->Get("triggeron1p");
+    TH1D* tt3 = (TH1D*)fin3->Get("triggeron3p");
+    TH1D* tt4 = (TH1D*)fin3->Get("triggeroff");
+    TH1D* tt5 = (TH1D*)fin3->Get("triggeroff1p");
+    TH1D* tt6 = (TH1D*)fin3->Get("triggeroff3p");
+
+    TFile* fin4 = new TFile("ztt_general.root", "read");
+    TH1D* ztt1 = (TH1D*)fin4->Get("triggeron");
+    TH1D* ztt2 = (TH1D*)fin4->Get("triggeron1p");
+    TH1D* ztt3 = (TH1D*)fin4->Get("triggeron3p");
+    TH1D* ztt4 = (TH1D*)fin4->Get("triggeroff");
+    TH1D* ztt5 = (TH1D*)fin4->Get("triggeroff1p");
+    TH1D* ztt6 = (TH1D*)fin4->Get("triggeroff3p");
+    
+    //total sample
+     TH1D* mc_on = new TH1D("mc_eff","Tau Pt;Tau Pt[GeV];",13,xbins);
+     TH1D* mc_on1p = new TH1D("mc1p_eff","Tau Pt;Tau Pt[GeV];",13,xbins);
+     TH1D* mc_on3p = new TH1D("mc3p_eff","Tau Pt;Tau Pt[GeV];",13,xbins);
+     TH1D* mc_off = new TH1D("off","Tau Pt;Tau Pt[GeV];",13,xbins);
+     TH1D* mc_off1p = new TH1D("off1p","Tau Pt;Tau Pt[GeV];]",13,xbins);
+     TH1D* mc_off3p = new TH1D("off3p","Tau Pt;Tau Pt[GeV];",13,xbins);
+    
+    mc_off->Add(wlv4);
+    mc_off->Add(zll4);
+    mc_off->Add(tt4);
+    mc_off->Add(ztt4);
+    mc_off->Add(datass4);
+    
+    mc_off1p->Add(wlv5);
+    mc_off1p->Add(zll5);
+    mc_off1p->Add(tt5);
+    mc_off1p->Add(ztt5);
+    mc_off1p->Add(datass5);
+    
+    mc_off3p->Add(wlv6);
+    mc_off3p->Add(zll6);
+    mc_off3p->Add(tt6);
+    mc_off3p->Add(ztt6);
+    mc_off3p->Add(datass6);
+    
+    mc_on->Add(wlv1);
+    mc_on->Add(zll1);
+    mc_on->Add(tt1);
+    mc_on->Add(ztt1);
+    mc_on->Add(datass1);
+    mc_on->Divide(mc_off);
+    
+    mc_on1p->Add(wlv2);
+    mc_on1p->Add(zll2);
+    mc_on1p->Add(tt2);
+    mc_on1p->Add(ztt2);
+    mc_on1p->Add(datass2);
+    mc_on1p->Divide(mc_off1p);
+    
+    mc_on3p->Add(wlv3);
+    mc_on3p->Add(zll3);
+    mc_on3p->Add(tt3);
+    mc_on3p->Add(ztt3);
+    mc_on3p->Add(datass3);
+    mc_on3p->Divide(mc_off3p);
+   
+    TFile* fout_mc = new TFile("mc_general.root", "recreate");
+    mc_on->Write();
+    mc_on1p->Write();
+    mc_on3p->Write();
+    fout_mc->Close();
+  
+}
+
