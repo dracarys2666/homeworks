@@ -1,0 +1,376 @@
+#include <iostream>
+#include<fstream>
+#include <TLorentzVector.h>
+#include <TFile.h>
+#include <TTree.h>
+// HLT_tau25_mediumRNN_tracktwoMVA
+using namespace std;
+
+void merge_general()
+{
+    double xbins[] = {25,28,30,32,34,36,39,43,52,64,80,100,150,300};
+   
+    TFile* fin1 = new TFile("mc_general.root", "read");
+    TH1D* mc1 = (TH1D*)fin1->Get("mc_eff");
+    TH1D* mc2 = (TH1D*)fin1->Get("mc1p_eff");
+    TH1D* mc3 = (TH1D*)fin1->Get("mc3p_eff");
+
+    TFile*fin2 = new TFile("data_general.root", "read");
+    TH1D* dataos1 = (TH1D*)fin2->Get("dataos_eff");
+    TH1D* dataos2 = (TH1D*)fin2->Get("dataos1p_eff");
+    TH1D* dataos3 = (TH1D*)fin2->Get("dataos3p_eff");
+    
+    //data/mc
+    TH1D* datamc_in = new TH1D("datamc_in","Tau Pt;Tau Pt[GeV];Data/exp.",13,xbins);
+    TH1D* datamc_1p = new TH1D("datamc_1p","Tau Pt;Tau Pt[GeV];Data/exp.",13,xbins);
+    TH1D* datamc_3p = new TH1D("datamc_3p","Tau Pt;Tau Pt[GeV];Data/exp.",13,xbins);
+    
+    datamc_in->Divide(dataos1,mc1);
+    datamc_in->SetStats(0);
+    datamc_in->SetLineColor(1);    //  black
+    datamc_in->SetMarkerColor(1);  //  black
+    datamc_in->SetMarkerStyle(8);
+    datamc_in->GetYaxis()->SetRangeUser(0.5,1.5);   // range of y
+    
+    datamc_1p->Divide(dataos2,mc2);
+    datamc_1p->SetStats(0);
+    datamc_1p->SetLineColor(1);    //  black
+    datamc_1p->SetMarkerColor(1);  //  black
+    datamc_1p->SetMarkerStyle(8);
+    datamc_1p->GetYaxis()->SetRangeUser(0.5,1.5);   // range of y
+    
+    datamc_3p->Divide(dataos3,mc3);
+    datamc_3p->SetStats(0);
+    datamc_3p->SetLineColor(1);    //  black
+    datamc_3p->SetMarkerColor(1);  //  black
+    datamc_3p->SetMarkerStyle(8);
+    datamc_3p->GetYaxis()->SetRangeUser(0.5,1.5);   // range of y
+    
+    int nentries_sf = datamc_in->GetNbinsX();
+    for(int i=0;i<nentries_sf;i++){
+        double sf = datamc_in->GetBinContent(i+1);
+        double sf_er = datamc_in->GetBinError(i+1);
+        cout<<"Bin["<<i+1<<"] SF = "<<sf<<" +- "<<sf_er<<endl;
+    } //for
+    
+    int nentries_sf1p = datamc_1p->GetNbinsX();
+    for(int i=0;i<nentries_sf1p;i++){
+        double sf = datamc_1p->GetBinContent(i+1);
+        double sf_er = datamc_1p->GetBinError(i+1);
+        cout<<"Bin["<<i+1<<"] SF(1p) = "<<sf<<" +- "<<sf_er<<endl;
+    } //for
+    
+    int nentries_sf3p = datamc_3p->GetNbinsX();
+    for(int i=0;i<nentries_sf3p;i++){
+        double sf = datamc_3p->GetBinContent(i+1);
+        double sf_er = datamc_3p->GetBinError(i+1);
+        cout<<"Bin["<<i+1<<"] SF (3p)= "<<sf<<" +- "<<sf_er<<endl;
+    } //for
+    
+    /*
+     Bin[1] SF = 0.963904 +- 0.0307026
+     Bin[2] SF = 0.97598 +- 0.0360006
+     Bin[3] SF = 0.98011 +- 0.0482659
+     Bin[4] SF = 0.974304 +- 0.0391257
+     Bin[5] SF = 0.973315 +- 0.0394208
+     Bin[6] SF = 0.983293 +- 0.0343702
+     Bin[7] SF = 0.997606 +- 0.0387058
+     Bin[8] SF = 1.01164 +- 0.0414277
+     Bin[9] SF = 0.979246 +- 0.0522795
+     Bin[10] SF = 1.02771 +- 0.0525883
+     Bin[11] SF = 1.00799 +- 0.0575026
+     Bin[12] SF = 1.00801 +- 0.0568117
+     Bin[13] SF = 1.00371 +- 0.0948107
+     Bin[1] SF(1p) = 0.968947 +- 0.032591
+     Bin[2] SF(1p) = 0.98353 +- 0.039068
+     Bin[3] SF(1p) = 0.991285 +- 0.0550801
+     Bin[4] SF(1p) = 0.978444 +- 0.0445202
+     Bin[5] SF(1p) = 0.976764 +- 0.0451096
+     Bin[6] SF(1p) = 0.990186 +- 0.0395574
+     Bin[7] SF(1p) = 1.00097 +- 0.0458777
+     Bin[8] SF(1p) = 1.00361 +- 0.0475906
+     Bin[9] SF(1p) = 0.983128 +- 0.0594835
+     Bin[10] SF(1p) = 1.02788 +- 0.0588
+     Bin[11] SF(1p) = 1.00424 +- 0.0652189
+     Bin[12] SF(1p) = 1.00634 +- 0.0640394
+     Bin[13] SF(1p) = 0.992284 +- 0.105321
+     Bin[1] SF (3p)= 0.881415 +- 0.0937839
+     Bin[2] SF (3p)= 0.858476 +- 0.0889012
+     Bin[3] SF (3p)= 0.916636 +- 0.09268
+     Bin[4] SF (3p)= 0.935239 +- 0.0791572
+     Bin[5] SF (3p)= 0.929918 +- 0.0790195
+     Bin[6] SF (3p)= 0.949248 +- 0.0686866
+     Bin[7] SF (3p)= 0.967845 +- 0.0692355
+     Bin[8] SF (3p)= 1.02544 +- 0.0834497
+     Bin[9] SF (3p)= 0.967436 +- 0.1098
+     Bin[10] SF (3p)= 1.02326 +- 0.116864
+     Bin[11] SF (3p)= 1.01356 +- 0.121389
+     Bin[12] SF (3p)= 1.00901 +- 0.122647
+     Bin[13] SF (3p)= 1.04704 +- 0.217835
+     */
+    
+    // total sample error
+    TH1D* n_in = new TH1D("n_in","Tau Pt;Tau Pt[GeV];Data/exp.",13,xbins);
+    TH1D* n_1p = new TH1D("n_1p","Tau Pt;Tau Pt[GeV];Data/exp.",13,xbins);
+    TH1D* n_3p = new TH1D("n_3p","Tau Pt;Tau Pt[GeV];Data/exp.",13,xbins);
+    
+    n_in->GetXaxis()->SetMoreLogLabels();
+    n_1p->GetXaxis()->SetMoreLogLabels();
+    n_3p->GetXaxis()->SetMoreLogLabels();
+
+    n_in->SetFillColor(2);
+    n_in->SetLineColor(2);
+    n_in->SetMarkerColor(0);
+    n_in->SetFillStyle(3244);//important
+    n_in->SetMarkerSize(0);
+    n_in->SetStats(0);
+    n_in->GetYaxis()->SetRangeUser(0.5,1.5);   // range of y
+    n_in->SetLabelSize(0.09,"x");
+    n_in->SetLabelSize(0.09,"y");
+    n_in->SetTitleSize(0.09,"x");
+    n_in->SetTitleSize(0.09,"y");
+    n_in->SetTitleOffset(0.9,"x");  // distance between title & axis
+    n_in->SetTitleOffset(0.3,"y");
+    
+    n_1p->SetFillColor(2);
+    n_1p->SetLineColor(2);
+    n_1p->SetMarkerColor(0);
+    n_1p->SetFillStyle(3244);//important
+    n_1p->SetMarkerSize(0);
+    n_1p->SetStats(0);
+    n_1p->GetYaxis()->SetRangeUser(0.5,1.5);   // range of y
+    n_1p->SetLabelSize(0.09,"x");
+    n_1p->SetLabelSize(0.09,"y");
+    n_1p->SetTitleSize(0.09,"x");
+    n_1p->SetTitleSize(0.09,"y");
+    n_1p->SetTitleOffset(0.9,"x");  // distance between title & axis
+    n_1p->SetTitleOffset(0.3,"y");
+    
+    n_3p->SetFillColor(2);
+    n_3p->SetLineColor(2);
+    n_3p->SetMarkerColor(0);
+    n_3p->SetFillStyle(3244);//important
+    n_3p->SetMarkerSize(0);
+    n_3p->SetStats(0);
+    n_3p->GetYaxis()->SetRangeUser(0.5,1.5);   // range of y
+    n_3p->SetLabelSize(0.09,"x");
+    n_3p->SetLabelSize(0.09,"y");
+    n_3p->SetTitleSize(0.09,"x");
+    n_3p->SetTitleSize(0.09,"y");
+    n_3p->SetTitleOffset(0.9,"x");  // distance between title & axis
+    n_3p->SetTitleOffset(0.3,"y");
+    
+    int nentries_in = mc1->GetNbinsX();
+    for(int i=0;i<nentries_in;i++){
+        double val1 = mc1->GetBinContent(i+1);
+        double err1 = mc1->GetBinError(i+1);
+        if(val1==0)continue;
+        double MCerr1 = err1/val1;
+        n_in->SetBinContent(i+1,1);
+        n_in->SetBinError(i+1,MCerr1);
+    } //for
+    
+    int nentries_1p = mc2->GetNbinsX();
+    for(int j=0;j<nentries_1p;j++){
+        double val2 = mc2->GetBinContent(j+1);
+        double err2 = mc2->GetBinError(j+1);
+        if(val2==0)continue;
+        double MCerr2 = err2/val2;
+        n_1p->SetBinContent(j+1,1);
+        n_1p->SetBinError(j+1,MCerr2);
+    } //for
+    
+    int nentries_3p = mc3->GetNbinsX();
+    for(int k=0;k<nentries_3p;k++){
+        double val3 = mc3->GetBinContent(k+1);
+        double err3 = mc3->GetBinError(k+1);
+        if(val3==0)continue;
+        double MCerr3 = err3/val3;
+        n_3p->SetBinContent(k+1,1);
+        n_3p->SetBinError(k+1,MCerr3);
+    } //for
+    
+    mc1->SetMarkerStyle(22);
+    mc1->SetMarkerSize(1);
+    mc1->SetMarkerColor(2);
+    
+    mc2->SetMarkerStyle(22);
+    mc2->SetMarkerSize(1);
+    mc2->SetMarkerColor(2);
+    
+    mc3->SetMarkerStyle(22);
+    mc3->SetMarkerSize(1);
+    mc3->SetMarkerColor(2);
+    
+    dataos1->SetMarkerStyle(8);
+    dataos1->SetMarkerSize(1);
+    dataos1->SetMarkerColor(1);
+    dataos1->SetLineColor(kBlack);
+ 
+    dataos2->SetMarkerStyle(8);
+    dataos2->SetMarkerSize(1);
+    dataos2->SetMarkerColor(1);
+    dataos2->SetLineColor(kBlack);
+    
+    dataos3->SetMarkerStyle(8);
+    dataos3->SetMarkerSize(1);
+    dataos3->SetMarkerColor(1);
+    dataos3->SetLineColor(kBlack);
+
+    gStyle->SetPadBottomMargin(0.2);
+    gStyle->SetOptTitle(0);
+   
+    //c1
+    TCanvas* c1 = new TCanvas("eff_EF", "",0,0,900,1000);
+    TPad *pad1 = new TPad("pad1","",0,0.3,1,1,0,0,0);
+    pad1->Draw();
+    pad1->SetNumber(1);
+    pad1->SetLogx();
+    pad1->SetBottomMargin(0.01);
+    TPad *pad2 = new TPad("pad2","",0,0.05,1,0.3,0,0,0);
+    pad2->SetGridy();
+    pad2->Draw();
+    pad2->SetLogx();
+    pad2->SetNumber(2);
+    
+    c1->cd(1);
+    dataos1->SetStats(0);
+    mc1->SetYTitle("Trigger Efficiency");
+    mc1->GetYaxis()->SetTitleOffset(0.9);
+    mc1->SetMaximum(1.1);
+    mc1->SetFillStyle(3244);
+    mc1->SetFillColor(kRed);
+    mc1->Draw("e2 same");
+    dataos1->Draw("e same");
+    TLegend *leg = new TLegend(0.6,0.2,0.95,0.3);
+    leg->SetBorderSize(0); //影をなくす
+    leg->SetFillStyle(0); //背景を透明にする
+    leg->AddEntry(dataos1,"Data","pl");
+    leg->AddEntry(mc1,"MC","pf");
+    leg->Draw();
+ /*
+    TText *t1 = new TLatex(150,0.5,"#int L dt=138.25fb^{-1} #sqrt{s}=13TeV");
+    t1->SetTextFont(42);
+    t1->SetTextSize(0.04);
+    t1->Draw();
+    ATLASLabel(0.2,0.85,"Internal",1);
+*/
+    TPaveText* pt1=new TPaveText(0.5,0.3,0.85,0.45,"brNDC");
+    pt1->SetFillStyle(0);
+    pt1->SetBorderSize(0);
+    TText* t1;
+    t1=pt1->AddText("HLT_tau25_mediumRNN_tracktwoMVA");
+    t1=pt1->AddText("#int L dt=58.45 fb^{-1} #sqrt{s}=13 TeV");
+    pt1->Draw();
+    ATLASLabel(0.51,0.5,"Internal",1);
+    
+    c1->cd(2);
+    n_in->GetYaxis()->SetLabelSize(0.09);
+    n_in->GetYaxis()->SetTitleOffset(0.3);
+    n_in->GetYaxis()->SetTitleSize(0.1);
+    n_in->GetXaxis()->SetLabelSize(0.09);
+    n_in->GetXaxis()->SetTitleOffset(0.9);
+    n_in->GetXaxis()->SetTitleSize(0.12);
+    n_in->Draw("e2");
+    datamc_in->Draw("e same");
+    
+ 
+
+    //c2
+    TCanvas* c2 = new TCanvas("eff1p_EF", "",0,0,900,1000);
+    TPad *pad3 = new TPad("pad3","",0,0.3,1,1,0,0,0);
+    pad3->Draw();
+    pad3->SetLogx();
+    pad3->SetNumber(1);
+    pad3->SetBottomMargin(0.01);
+    TPad *pad4 = new TPad("pad4","",0,0.05,1,0.3,0,0,0);
+    pad4->SetGridy();
+    pad4->Draw();
+    pad4->SetLogx();
+    pad4->SetNumber(2);
+    
+    c2->cd(1);
+    mc2->SetYTitle("Trigger Efficiency");
+    mc2->GetYaxis()->SetTitleOffset(0.9);
+    mc2->SetMaximum(1.1);
+    mc2->SetFillStyle(3244);
+    mc2->SetFillColor(kRed);
+    mc2->Draw("e2 same");
+    dataos2->Draw("e same");
+    TLegend *leg2 = new TLegend(0.6,0.2,0.95,0.3);
+    leg2->SetBorderSize(0); //影をなくす
+    leg2->SetFillStyle(0); //背景を透明にする
+    leg2->AddEntry(dataos2,"Data","pl");
+    leg2->AddEntry(mc2,"MC","pf");
+    leg2->Draw();
+   
+    TPaveText* pt2 =new TPaveText(0.5,0.3,0.85,0.45,"brNDC");
+    pt2->SetFillStyle(0);
+    pt2->SetBorderSize(0);
+    TText* t2;
+    t2=pt2->AddText("HLT_tau25_mediumRNN_tracktwoMVA(1p)");
+    t2=pt2->AddText("#int L dt=58.45 fb^{-1} #sqrt{s}=13 TeV");
+    pt2->Draw();
+    ATLASLabel(0.51,0.5,"Internal",1);
+    
+    c2->cd(2);
+    n_1p->GetYaxis()->SetLabelSize(0.09);
+    n_1p->GetYaxis()->SetTitleOffset(0.3);
+    n_1p->GetYaxis()->SetTitleSize(0.1);
+    n_1p->GetXaxis()->SetLabelSize(0.09);
+    n_1p->GetXaxis()->SetTitleOffset(0.9);
+    n_1p->GetXaxis()->SetTitleSize(0.12);
+    n_1p->Draw("e2");
+    datamc_1p->Draw("e same");
+   
+    
+    //c3
+    TCanvas* c3 = new TCanvas("eff3p_EF", "",0,0,900,1000);
+    TPad *pad5 = new TPad("pad5","",0,0.3,1,1,0,0,0);
+    pad5->Draw();
+    pad5->SetLogx();
+    pad5->SetNumber(1);
+    pad5->SetBottomMargin(0.01);
+    TPad *pad6 = new TPad("pad6","",0,0.05,1,0.3,0,0,0);
+    pad6->SetGridy();
+    pad6->Draw();
+    pad6->SetLogx();
+    pad6->SetNumber(2);
+    
+    c3->cd(1);
+    mc3->SetYTitle("Trigger Efficiency");
+    mc3->GetYaxis()->SetTitleOffset(0.9);
+    mc3->SetMaximum(1.1);
+    mc3->SetFillStyle(3244);
+    mc3->SetFillColor(kRed);
+    mc3->Draw("e2 same");
+    dataos3->Draw("e same");
+    TLegend *leg3 = new TLegend(0.6,0.2,0.95,0.3);
+    leg3->SetBorderSize(0); //影をなくす
+    leg3->SetFillStyle(0); //背景を透明にする
+    leg3->AddEntry(dataos3,"Data","pl");
+    leg3->AddEntry(mc3,"MC","pf");
+    leg3->Draw();
+    
+    TPaveText *pt3=new TPaveText(0.5,0.3,0.85,0.45,"brNDC");
+    pt3->SetFillStyle(0);
+    pt3->SetBorderSize(0);
+    TText* t3;
+    t3=pt3->AddText("HLT_tau25_mediumRNN_tracktwoMVA(3p)");
+    t3=pt3->AddText("#int L dt=58.45 fb^{-1} #sqrt{s}=13 TeV");
+    pt3->Draw();
+    ATLASLabel(0.51,0.5,"Internal",1);
+    
+    c3->cd(2);
+    n_3p->GetYaxis()->SetLabelSize(0.09);
+    n_3p->GetYaxis()->SetTitleOffset(0.3);
+    n_3p->GetYaxis()->SetTitleSize(0.1);
+    n_3p->GetXaxis()->SetLabelSize(0.09);
+    n_3p->GetXaxis()->SetTitleOffset(0.9);
+    n_3p->GetXaxis()->SetTitleSize(0.12);
+    
+    n_3p->Draw("e2");
+    datamc_3p->Draw("e same");
+        
+}
+
