@@ -1,0 +1,22 @@
+void treat_bin(TH1* hist){
+  hist->Sumw2();
+
+  //treat overflow bin                                                                                                                                                                                                                                                         
+  int nbin = hist->GetNbinsX();
+  double val_OFBin = hist->GetBinContent(nbin+1);
+  double err_OFBin = hist->GetBinError(nbin+1);
+  double err_LastBin = hist->GetBinError(nbin);
+  double err_LastBin_fixed = TMath::Sqrt((err_LastBin*err_LastBin)+(err_OFBin*err_OFBin));
+  hist->AddBinContent(nbin,val_OFBin);
+  hist->SetBinError(nbin,err_LastBin_fixed);
+
+  //treat underflow bin                                                                                                                                                                                                                                                        
+  double val_UFBin = hist->GetBinContent(0);
+  double err_UFBin = hist->GetBinError(0);
+  double err_FirstBin =hist->GetBinError(1);
+  double err_FirstBin_fixed = TMath::Sqrt((err_FirstBin*err_FirstBin)+(err_UFBin*err_UFBin));
+  hist->AddBinContent(1,val_UFBin);
+  hist->SetBinError(1,err_FirstBin_fixed);
+
+  gStyle->SetOptTitle(0);
+}
