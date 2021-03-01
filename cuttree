@@ -1,0 +1,58 @@
+#include <iostream>
+#include<fstream>
+#include <TLorentzVector.h>
+#include <TFile.h>
+#include <TTree.h>
+using namespace std;
+
+void data_cut()
+{
+    // muon trigger
+    TCut cut1 = "HLT_mu26_ivarmedium==1 || HLT_mu50==1";
+    // muon working point
+    TCut cut2 = "lep_0_iso_PflowLoose_VarRad==1";
+    //   ID medium
+    TCut cut3 = "lep_0_id_medium==1 && tau_0_jet_rnn_medium==1";
+    //muon veto
+    TCut cut4 = "tau_0_pass_tst_muonolr";
+    // electron = 0、 muon = 1、tau = 1
+    TCut cut5 ="n_muons==1 && n_taus==1 && n_electrons==0";
+    // muon:pt>28,|eta|<2.5
+    TCut cut6 = "lep_0_p4->Pt()>28.0 && abs(lep_0_p4->Eta())<2.5";
+    // tau:pt>25,|eta|<2.47(1.37~1.52)除く
+    TCut cut7 = "tau_0_p4->Pt()>25.0 && ( ( abs(tau_0_p4->Eta())<2.47 && abs(tau_0_p4->Eta())>1.52 )||(abs(tau_0_p4->Eta())<1.37) )";
+    // number of tau tracks = 1 or 3
+    TCut cut8 = "tau_0_n_charged_tracks==1||tau_0_n_charged_tracks==3";
+    
+    TCut cut9 = "lephad_qxq==-1";
+    TCut cut10 = "lephad_qxq==1";
+    TCut c0 = cut1 && cut2 && cut3 && cut4 && cut5 && cut6 && cut7 && cut8;
+    TCut c1 = c0 && cut9;  // os
+    TCut c2 = c0 && cut10; // ss
+    
+    TChain *ch=new TChain("NOMINAL", "tree");
+    ch->Add("/gpfs/fs7001/qkong/datamc1516/total/data_all1516*.root");
+    
+    //CopyTree
+    TFile *fout0 = new TFile("data_cut.root", "recreate");
+    TTree *T_data0 = (TChain*)ch->CopyTree(c0);
+    
+    T_data0->Write();
+    fout0->Close();
+    
+    
+    //CopyTree OS
+    TFile *fout1 = new TFile("data_cutos.root", "recreate");
+    TTree *T_data1 = (TChain*)ch->CopyTree(c1);
+    
+    T_data1->Write();
+    fout1->Close();
+    
+    //CopyTree SS
+    TFile *fout2 = new TFile("data_cutss.root", "recreate");
+    TTree *T_data2 = (TChain*)ch->CopyTree(c2);
+    
+    T_data2->Write();
+    fout2->Close();
+    
+}
